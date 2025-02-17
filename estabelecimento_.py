@@ -7,13 +7,13 @@ import pyarrow as pa
 from funcoes_uteis import csvToSeriesIndex
 
 # Caminho da pasta onde estão os arquivos CSV
-pasta_socios = "arquivos_extraidos/ESTABELE"
+pasta_estabele = "arquivos_extraidos/ESTABELE"
 pasta_pais = "arquivos_extraidos/PAIS/"
 pasta_motivo = "arquivos_extraidos/MOTIC/"
 pasta_municipio = "arquivos_extraidos/MUNIC/"
 
 # Usar glob para listar todos os arquivos CSV dentro da pasta
-arquivos_csv = glob.glob(os.path.join(pasta_socios, "*.csv"))
+arquivos_csv = glob.glob(os.path.join(pasta_estabele, "*.csv"))
 arquivos_pais = glob.glob(os.path.join(pasta_pais, "*.csv"))
 arquivos_motivo = glob.glob(os.path.join(pasta_motivo, "*.csv"))
 arquivos_munic = glob.glob(os.path.join(pasta_municipio, "*.csv"))
@@ -26,10 +26,13 @@ pais = csvToSeriesIndex(arquivos_pais[0])
 motivo = csvToSeriesIndex(arquivos_motivo[0])
 municipio = csvToSeriesIndex(arquivos_munic[0])
 
-chunk_size = 30000  # 20.000 linhas por vez
+chunk_size = 30000  # 30.000 linhas por vez
 
 # Definir o nome do arquivo Parquet
 output_parquet = "estabelecimentos_completo.parquet"
+
+# Definir o caminho completo do parquet
+caminho_completo = pasta_estabele+output_parquet
 
 # Preparar o ParquetWriter para salvar os dados progressivamente
 with tqdm(total=len(arquivos_csv), desc="Processando arquivos", unit="arquivo") as pbar:
@@ -77,10 +80,6 @@ with tqdm(total=len(arquivos_csv), desc="Processando arquivos", unit="arquivo") 
                              'situacao_especial',
                              'data_situacao_especial']
             
-            # Verificar se a coluna 'cnpj_basico' existe, e se não, criar com base no 'cnpj_ordem'
-            # if 'cnpj_basico' not in chunk.columns:
-            #     chunk['cnpj_basico'] = chunk['cnpj_ordem'].str[:8]  # Criar a coluna com os 8 primeiros caracteres de 'cnpj_ordem'
-
             # Remover espaços extras das colunas
             chunk = chunk.map(lambda x: x.strip() if isinstance(x, str) else x)
 
@@ -104,9 +103,9 @@ with tqdm(total=len(arquivos_csv), desc="Processando arquivos", unit="arquivo") 
             
             # Usar ParquetWriter para salvar os dados progressivamente
             if not os.path.exists(output_parquet):  # Se o arquivo não existe, cria o arquivo
-                pq.write_table(table, output_parquet, compression='SNAPPY')
+                pq.write_table(table, caminho_completo, compression='SNAPPY')
             else:  # Caso contrário, abre o arquivo e anexa os dados
-                with pq.ParquetWriter(output_parquet, table.schema, compression='SNAPPY') as writer:
+                with pq.ParquetWriter(caminho_completo, table.schema, compression='SNAPPY') as writer:
                     writer.write_table(table)
 
         # Atualiza a barra de progresso após processar cada arquivo
