@@ -1,7 +1,7 @@
 import os 
 import shutil
 
-pasta = "D:/projeto_novo/arquivos_extraidos"
+pasta = "arquivos_extraidos/"
 
 categorias = ["EMPRE", "SOCIO", "ESTABELE","MUNIC", "MOTIC","PAIS","NATJU","CNAE", "QUALS", "SIMPLES"]
 

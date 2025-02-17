@@ -1,10 +1,17 @@
 import pandas as pd
 
+caminho_completo = "arquivos_extraidos/SOCIO/socio_completo.parquet"
+socios = pd.read_parquet(caminho_completo)
+socios['identificador_socio'] = socios['identificador_socio'].astype(str)
+for socio in socios['identificador_socio']:
+    
+    if socio == '1':
+        socio = 'Pessoa Jurídica'
+    elif socio == '2':
+        socio = 'Pessoa Física'
+    else:
+        socio = 'Estrangeiro'
 
     
-    # Tente ler o arquivo com a codificação latin1
-df = pd.read_csv("arquivos_extraidos/SOCIO/socios_completo.csv", sep=";", encoding="latin1", on_bad_lines='skip')
-
-print(df.head(10))
-
-  
+    
+print(socios)

@@ -1,9 +1,9 @@
 from union import combinar_socios
 
 # Caminho onde estão os arquivos CSV
-pasta_socios = "D:/projeto_novo/arquivos_extraidos/SOCIO"
+pasta_socios = "arquivos_extraidos/SOCIO"
 # Caminho do arquivo final
-caminho_arquivo_final = "D:/projeto_novo/df_combinados/socios_combinados.csv"
+caminho_arquivo_final = "df_combinados/socios_combinados.csv"
 
 # Chamando a função para combinar os arquivos
 df_combinado = combinar_socios(pasta_socios, caminho_arquivo_final)

@@ -1,9 +1,9 @@
 import os
 import pandas as pd
-from tqdm import tqdm  
+#from tqdm import tqdm  
 
 # Caminho da pasta onde estão os arquivos
-pasta_socios = "arquivos_extraidos/ESTABELE"
+pasta_socios = "arquivos_extraidos/SIMPLES"
 
 # Iterando por todos os arquivos na pasta
 for arquivo in os.listdir(pasta_socios):

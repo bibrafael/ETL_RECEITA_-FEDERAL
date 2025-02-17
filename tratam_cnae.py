@@ -16,9 +16,9 @@ df = pd.read_csv(
 # Definindo manualmente os nomes das colunas
 df.columns = ["CÓDIGO", "DESCRIÇÃO"]
 
-df["CÓDIGO"] = df["CÓDIGO"].str.replace(",", ".").astype(float)
+df["CÓDIGO"] = df["CÓDIGO"].str.replace(",", ".").astype(int)
 
 # Salvando em um novo CSV com os novos cabeçalhos
-# df.to_csv(novo_arquivo, sep=";", index=False, encoding="latin1")
+df.to_csv(novo_arquivo, sep=";", index=False, encoding="latin1")
 
 print(df.info())

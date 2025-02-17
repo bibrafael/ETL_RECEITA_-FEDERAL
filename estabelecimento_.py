@@ -4,18 +4,29 @@ import glob
 from tqdm import tqdm  # Importando a barra de progresso
 import pyarrow.parquet as pq
 import pyarrow as pa
+from funcoes_uteis import csvToSeriesIndex
 
 # Caminho da pasta onde estão os arquivos CSV
 pasta_socios = "arquivos_extraidos/ESTABELE"
+pasta_pais = "arquivos_extraidos/PAIS/"
+pasta_motivo = "arquivos_extraidos/MOTIC/"
+pasta_municipio = "arquivos_extraidos/MUNIC/"
 
 # Usar glob para listar todos os arquivos CSV dentro da pasta
 arquivos_csv = glob.glob(os.path.join(pasta_socios, "*.csv"))
+arquivos_pais = glob.glob(os.path.join(pasta_pais, "*.csv"))
+arquivos_motivo = glob.glob(os.path.join(pasta_motivo, "*.csv"))
+arquivos_munic = glob.glob(os.path.join(pasta_municipio, "*.csv"))
 
 # Lista para armazenar os DataFrames de cada arquivo
 lista_dfs = []
 
+situacao = {'01':'Nula', '2':'Ativa', '3':'Suspensa','4':'Inapta','08':'Baixada'}
+pais = csvToSeriesIndex(arquivos_pais[0])
+motivo = csvToSeriesIndex(arquivos_motivo[0])
+municipio = csvToSeriesIndex(arquivos_munic[0])
 
-chunk_size = 20000  # 20.000 linhas por vez
+chunk_size = 30000  # 20.000 linhas por vez
 
 # Definir o nome do arquivo Parquet
 output_parquet = "estabelecimentos_completo.parquet"
@@ -67,11 +78,16 @@ with tqdm(total=len(arquivos_csv), desc="Processando arquivos", unit="arquivo") 
                              'data_situacao_especial']
             
             # Verificar se a coluna 'cnpj_basico' existe, e se não, criar com base no 'cnpj_ordem'
-            if 'cnpj_basico' not in chunk.columns:
-                chunk['cnpj_basico'] = chunk['cnpj_ordem'].str[:8]  # Criar a coluna com os 8 primeiros caracteres de 'cnpj_ordem'
+            # if 'cnpj_basico' not in chunk.columns:
+            #     chunk['cnpj_basico'] = chunk['cnpj_ordem'].str[:8]  # Criar a coluna com os 8 primeiros caracteres de 'cnpj_ordem'
 
             # Remover espaços extras das colunas
-            chunk = chunk.applymap(lambda x: x.strip() if isinstance(x, str) else x)
+            chunk = chunk.map(lambda x: x.strip() if isinstance(x, str) else x)
+
+            chunk['situacao_cadastral'] = chunk['situacao_cadastral'].map(situacao)
+            chunk['pais'] = chunk['pais'].map(pais)
+            chunk['motivo_situacao_cadastral'] = chunk['motivo_situacao_cadastral'].map(motivo)
+            chunk['municipio'] = chunk['municipio'].map(motivo)
             
             # Reordenar o DataFrame (se necessário)
             chunk_reordenado = chunk[['cnpj_basico', 'cnpj_ordem', 'cnpj_dv', 'identificador_matriz_filial', 
